@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Link this folder into the places Claude Code reads from.
+# Link this folder into the places Claude Code reads from, then print the
+# settings.json entries that point at the links.
 #
 #   ./install.sh [--dry-run]
 #
@@ -69,4 +70,18 @@ status=0
 link "$here/CLAUDE.md" "$claude_dir/CLAUDE.md" || status=1
 link "$here/statusline.sh" "$claude_dir/statusline-command.sh" || status=1
 link "$here/subagent-statusline.sh" "$claude_dir/subagent-statusline.sh" || status=1
+
+cat <<SETTINGS
+
+settings.json in $claude_dir:
+  "statusLine": {
+    "type": "command",
+    "command": "bash $claude_dir/statusline-command.sh",
+    "refreshInterval": 2
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "bash $claude_dir/subagent-statusline.sh"
+  }
+SETTINGS
 exit "$status"
