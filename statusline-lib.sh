@@ -3,8 +3,14 @@
 # Helpers shared by statusline.sh and subagent-statusline.sh. Sourced, not
 # run. Pure bash: each helper sets one global instead of forking a subshell.
 #
-# Widths are terminal columns: East Asian wide characters count two,
-# combining marks none.
+# Widths are terminal columns, by the rule of wcwidth(3): a character is 2
+# columns when Unicode lists it as wide or fullwidth, 0 when it is a
+# combining mark, a format character, or a conjoining Hangul jamo, and 1
+# otherwise. The ranges come from width-table.sh, which gen-width-table.py
+# writes from Python's Unicode data.
+
+# shellcheck source=width-table.sh
+source "$(dirname "${BASH_SOURCE[0]}")/width-table.sh"
 
 _pct_color() { # 0-100 -> _c  (green calm, yellow watch, red act)
     if [ "$1" -ge 80 ]; then
@@ -35,20 +41,37 @@ _format_tokens() { # 639600 -> 639.6k, 1000000 -> 1M -> _fmt
     _fmt="${_fmt/.0k/k}"
 }
 
+_in_ranges() { # table-name code-point -> _in  (1 when the point is inside a range)
+    local -n _table="$1"
+    local cp="$2" lo=0 hi=$((${#_table[@]} / 2 - 1)) mid
+    _in=0
+    while ((lo <= hi)); do
+        mid=$(((lo + hi) / 2))
+        if ((cp < _table[mid * 2])); then
+            hi=$((mid - 1))
+        elif ((cp > _table[mid * 2 + 1])); then
+            lo=$((mid + 1))
+        else
+            _in=1
+            return
+        fi
+    done
+}
+
 _char_width() { # one character -> _cw  (0, 1 or 2 terminal columns)
     local cp
     printf -v cp '%d' "'$1"
-    if ((cp >= 0x300 && cp <= 0x36F)) || ((cp >= 0x200B && cp <= 0x200F)); then
-        _cw=0
-    elif ((cp >= 0x1100 && cp <= 0x115F)) || ((cp >= 0x2E80 && cp <= 0xA4CF)) ||
-        ((cp >= 0xAC00 && cp <= 0xD7A3)) || ((cp >= 0xF900 && cp <= 0xFAFF)) ||
-        ((cp >= 0xFE30 && cp <= 0xFE4F)) || ((cp >= 0xFF00 && cp <= 0xFF60)) ||
-        ((cp >= 0xFFE0 && cp <= 0xFFE6)) || ((cp >= 0x1F300 && cp <= 0x1F64F)) ||
-        ((cp >= 0x1F900 && cp <= 0x1F9FF)); then
-        _cw=2
-    else
+    if ((cp < 0x300)); then # nothing below U+0300 is wide or zero width
         _cw=1
+        return
     fi
+    _in_ranges ZERO_RANGES "$cp"
+    if ((_in)); then
+        _cw=0
+        return
+    fi
+    _in_ranges WIDE_RANGES "$cp"
+    _cw=$((_in ? 2 : 1))
 }
 
 _visible_len() { # string with ANSI colour escapes -> _vlen (terminal columns)

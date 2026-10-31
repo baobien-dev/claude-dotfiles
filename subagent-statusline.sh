@@ -14,8 +14,8 @@
 # fit; if the fixed part alone overflows, effort, model, agent type, and time
 # drop in that order.
 #
-# Widths are terminal columns: East Asian wide characters count two,
-# combining marks none.
+# Widths are terminal columns, by the Unicode table in statusline-lib.sh:
+# wide characters count two, combining and format characters none.
 #
 # The model comes from the subagent's own transcript when that file exists,
 # because the panel's model field is fixed at spawn: after a model fallback

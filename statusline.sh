@@ -8,9 +8,10 @@
 # on them: the git state of the current directory, and the plan tier from
 # Claude Code's account file.
 #
-# Widths are terminal columns: East Asian wide characters count two,
-# combining marks none. Below about 63 columns the fixed rows are wider than
-# the terminal, and the terminal wraps the card.
+# Widths are terminal columns, by the Unicode table in statusline-lib.sh:
+# wide characters count two, combining and format characters none. Below
+# about 63 columns the fixed rows are wider than the terminal, and the
+# terminal wraps the card.
 #
 # Field schema: https://code.claude.com/docs/en/statusline
 
