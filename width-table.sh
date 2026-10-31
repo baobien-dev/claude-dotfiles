@@ -1,4 +1,4 @@
-# shellcheck shell=bash
+# shellcheck shell=bash disable=SC2034
 # Written by gen-width-table.py from Python 3.14.8, Unicode 16.0.0.
 # Inclusive code point ranges as lo hi pairs, sorted. Sourced by statusline-lib.sh.
 WIDE_RANGES=(
