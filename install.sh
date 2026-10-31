@@ -23,7 +23,9 @@ for arg in "$@"; do
         dry_run=1
         ;;
     -h | --help)
-        sed -n '3,12p' "$0"
+        # The help is this file's header comment: everything after the
+        # shebang, up to the first line that is not a comment.
+        awk 'NR == 1 && /^#!/ { next } /^#/ { sub(/^# ?/, ""); if (!seen && $0 == "") next; seen = 1; print; next } { exit }' "$0"
         exit 0
         ;;
     *)
