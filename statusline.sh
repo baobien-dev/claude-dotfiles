@@ -234,20 +234,22 @@ done
 # Read from Claude Code's own account record, so it tracks the live plan.
 # CLAUDE_CONFIG_DIR moves that file for a second account, so resolve it per
 # instance and key the cache to it. 5 min TTL: the tier almost never changes
-# but the file churns constantly.
+# but the file churns constantly. A tier the table below doesn't name shows
+# no badge, and that empty answer is cached like any other.
 acct="${HOME:-}/.claude.json"
 if [ -n "${CLAUDE_CONFIG_DIR:-}" ] && [ -f "$CLAUDE_CONFIG_DIR/.claude.json" ]; then
     acct="$CLAUDE_CONFIG_DIR/.claude.json"
 fi
 tier_cache="$CACHE_DIR/claude_statusline_tier_${UID}_${acct//\//_}"
-tier_text=""
+tier_text="" tier_fresh=0
 if [ -f "$tier_cache" ]; then
     cache_mtime=$(stat -c %Y "$tier_cache" 2>/dev/null || stat -f %m "$tier_cache" 2>/dev/null || echo 0)
     if [ $((NOW - cache_mtime)) -lt 300 ]; then
         IFS= read -r tier_text <"$tier_cache"
+        tier_fresh=1
     fi
 fi
-if [ -z "$tier_text" ]; then
+if [ "$tier_fresh" -eq 0 ]; then
     tier=$(jq -r '.oauthAccount.organizationRateLimitTier // .oauthAccount.userRateLimitTier // ""' "$acct" 2>/dev/null)
     case "$tier" in
     *max_20x*) tier_text="Max 20x" ;;
@@ -256,7 +258,6 @@ if [ -z "$tier_text" ]; then
     *free*) tier_text="Free" ;;
     *team*) tier_text="Team" ;;
     *enterprise*) tier_text="Enterprise" ;;
-    *) tier_text="Claude" ;;
     esac
     printf '%s' "$tier_text" >"$tier_cache" 2>/dev/null || true
 fi
@@ -288,7 +289,7 @@ _badge "$effort_styled"
 [ "$fast_mode" = "true" ] && _badge "${YELLOW}fast${RST}"
 [ -n "$vim_mode" ] && _badge "${CYAN}${vim_mode}${RST}"
 [ -n "$agent_name" ] && _badge "${MAGENTA}⚙ ${agent_name}${RST}"
-_badge "${GREEN}${tier_text}${RST}"
+[ -n "$tier_text" ] && _badge "${GREEN}${tier_text}${RST}"
 hdr_left="${BOLD}${WHITE}${model}${RST}"
 hdr_right="$badges"
 
