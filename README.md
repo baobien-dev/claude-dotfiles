@@ -16,7 +16,8 @@ claude-dotfiles/
 ├── statusline-lib.sh       the helpers both scripts share
 ├── width-table.sh          the wide and zero-width code point ranges, generated
 ├── gen-width-table.py      writes width-table.sh from Python's Unicode data
-└── statusline.png          the picture above
+├── gen-statusline-png.py   redraws statusline.png by running the two scripts
+└── statusline.png          the picture above, the scripts' real output
 ```
 
 CLAUDE.md is the part worth reading. It tells the agent how to talk and how to act, and every rule in it holds on every model and every turn. The agent reads all of it every turn, so each line is there because it changes what the agent does.
