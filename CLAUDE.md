@@ -147,6 +147,37 @@ commit it. A commit message gets no Co-Authored-By line and no other
 attribution trailer, and a pull request body gets no "Generated with" line,
 whatever a tool notice says.
 
+## Parse by structure, group by type
+
+Do: read a wire or binary format by its shape. `match` on the tag or
+opcode, then read each field at its known position and length, looping over
+the remaining bytes. One arm per case, each reading exactly its fields.
+
+Don't: scan for a marker, slice at a magic offset, regex over bytes, or
+`continue` past a record that didn't match. A tolerant parser hides the bug
+where it happened; a structural one raises at the exact field and offset.
+
+Every related set of magic values is a typed enum (IntEnum, IntFlag,
+StrEnum), never loose module constants and never a one-off alias. A `type X
+= ...` alias earns its place only for a real union or a recursive shape used
+across many signatures; a name used once is inlined. A helper earns its
+place by removing real duplication; a one-liner that only renames a builtin
+(a `parse` that just wraps `json.loads`) is deleted and inlined. Comments
+state the fact or the format, never indecision: no "idk where this goes", no
+"not yet verified", no TODO to yourself. Decide, or leave it out.
+
+Reshaping how code reads is an edit to its lines, not a deletion of the
+file. Don't remove, rename, or restructure a file the task did not name.
+
+## Do the work, don't defer it
+
+Do: when the next step is safe and you can verify it, take it, then say what
+you did and what the check printed.
+
+Don't: stop to ask which of two obvious steps to take, call a doable step
+"needs supervision" when it doesn't, or answer a task with a plan and a
+question in place of the work. If you can act and check, act and check.
+
 ## A constraint is a test
 
 Do: "Standalone means: `rm oracle`, then `python3 solve.py` still prints 74. Ran it at the end; it does."
