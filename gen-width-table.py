@@ -8,7 +8,11 @@ import unicodedata
 
 def is_zero(cp):
     category = unicodedata.category(chr(cp))
-    return (category in ("Mn", "Me", "Cf") and cp != 0xAD) or 0x1160 <= cp <= 0x11FF or 0xD7B0 <= cp <= 0xD7FF
+    return (
+        (category in ("Mn", "Me", "Cf") and cp != 0xAD)
+        or 0x1160 <= cp <= 0x11FF
+        or 0xD7B0 <= cp <= 0xD7FF
+    )
 
 
 def is_wide(cp):
@@ -33,7 +37,11 @@ def emit(name, points):
 zero = [cp for cp in range(sys.maxunicode + 1) if is_zero(cp)]
 wide = [cp for cp in range(sys.maxunicode + 1) if is_wide(cp) and not is_zero(cp)]
 print("# shellcheck shell=bash disable=SC2034")
-print(f"# Written by gen-width-table.py from Python {sys.version.split()[0]}, Unicode {unicodedata.unidata_version}.")
-print("# Inclusive code point ranges as lo hi pairs, sorted. Sourced by statusline-lib.sh.")
+print(
+    f"# Written by gen-width-table.py from Python {sys.version.split()[0]}, Unicode {unicodedata.unidata_version}."
+)
+print(
+    "# Inclusive code point ranges as lo hi pairs, sorted. Sourced by statusline-lib.sh."
+)
 print(emit("WIDE_RANGES", wide))
 print(emit("ZERO_RANGES", zero))
