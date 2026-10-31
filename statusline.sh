@@ -9,9 +9,9 @@
 # Claude Code's account file.
 #
 # Widths are terminal columns, by the Unicode table in statusline-lib.sh:
-# wide characters count two, combining and format characters none. Below
-# about 63 columns the fixed rows are wider than the terminal, and the
-# terminal wraps the card.
+# wide characters count two, combining and format characters none. The
+# directory row is cut to the terminal width; the other rows are as wide as
+# their content, so a terminal narrower than the widest row wraps the card.
 #
 # Field schema: https://code.claude.com/docs/en/statusline
 
