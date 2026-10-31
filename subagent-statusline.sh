@@ -123,7 +123,7 @@ _live_model() { # task id -> _live  (model of the subagent's last response, or "
 _compose() { # title pieces[] -> content, pieces joined by a dim dot
     local piece
     content="$title"
-    for piece in ${pieces[@]+"${pieces[@]}"}; do
+    for piece in "${pieces[@]}"; do
         [ -n "$piece" ] && content+=" ${DIM}·${RST} ${piece}"
     done
 }
